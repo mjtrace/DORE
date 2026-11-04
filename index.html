@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DORE: Distributional Estimation of 3D Object Orientation</title>
+  <meta name="description" content="DORE predicts the orientation of a 3D point cloud as a distribution over SO(3), representing every valid orientation of symmetric objects. NeurIPS 2026.">
+  <meta property="og:title" content="DORE: Distributional Estimation of 3D Object Orientation">
+  <meta property="og:description" content="An SO(3)-equivariant framework that represents 3D object orientation as a distribution over SO(3). NeurIPS 2026.">
+  <meta property="og:image" content="static/images/method_overview.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1d2430;
+      --muted: #5b6573;
+      --line: #e3e7ee;
+      --paper: #ffffff;
+      --wash: #f5f7fa;
+      --accent: #38669f;
+      --accent-ink: #ffffff;
+      --soft: #e8eef7;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #e6e9ef;
+        --muted: #a2abb8;
+        --line: #2c3340;
+        --paper: #14181f;
+        --wash: #1b2029;
+        --accent: #7aa5dc;
+        --accent-ink: #0f1622;
+        --soft: #1f2a3a;
+      }
+      figure img { background: #ffffff; }
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px/1.65 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+    header { padding: 64px 0 36px; text-align: center; }
+    .venue {
+      display: inline-block; margin-bottom: 18px; padding: 3px 12px;
+      border: 1px solid var(--line); border-radius: 999px;
+      font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+    }
+    h1 {
+      margin: 0 auto 6px; max-width: 760px;
+      font: 600 clamp(28px, 4.4vw, 44px)/1.15 "Source Serif 4", Georgia, serif;
+      text-wrap: balance;
+    }
+    h1 .name { color: var(--accent); }
+    .authors { margin: 22px 0 4px; font-size: 18px; }
+    .authors a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); }
+    .authors span + span::before { content: ""; display: inline-block; width: 22px; }
+    .affil { color: var(--muted); font-size: 15px; }
+    .note { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 28px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px; border-radius: 999px;
+      background: var(--ink); color: var(--paper);
+      font-weight: 500; font-size: 15px; text-decoration: none;
+    }
+    .btn.soon { background: var(--wash); color: var(--muted); border: 1px solid var(--line); cursor: default; }
+    .btn svg { width: 16px; height: 16px; }
+    section { padding: 40px 0; border-top: 1px solid var(--line); }
+    h2 {
+      margin: 0 0 18px;
+      font: 600 26px/1.2 "Source Serif 4", Georgia, serif;
+    }
+    .abstract p { max-width: 70ch; margin: 0 auto; text-align: justify; hyphens: auto; }
+    .abstract h2 { text-align: center; }
+    figure { margin: 0; }
+    figure img { display: block; width: 100%; height: auto; border-radius: 6px; }
+    figcaption { margin-top: 12px; color: var(--muted); font-size: 14.5px; max-width: 78ch; }
+    .highlights { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 28px; }
+    .card { background: var(--wash); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+    .card b { display: block; margin-bottom: 4px; font-size: 15px; }
+    .card span { color: var(--muted); font-size: 14.5px; }
+    .narrow { max-width: 720px; margin: 0 auto; }
+    pre {
+      margin: 0; padding: 16px 18px; overflow-x: auto;
+      background: var(--wash); border: 1px solid var(--line); border-radius: 8px;
+      font: 13.5px/1.55 "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    }
+    footer { padding: 32px 0 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; text-align: center; }
+    footer a { color: inherit; }
+    @media (max-width: 520px) {
+      header { padding-top: 44px; }
+      .authors span { display: block; }
+      .authors span + span::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="venue">NeurIPS 2026</div>
+    <h1><span class="name">DORE</span>: Distributional Estimation of 3D Object Orientation</h1>
+    <div class="authors">
+      <span>Minjoon Kim</span><span>Chunghyun Park</span><span>Minsu Cho</span>
+    </div>
+    <div class="affil">POSTECH</div>
+    <div class="links">
+      <span class="btn soon" title="Coming soon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
+        Paper (coming soon)
+      </span>
+      <span class="btn soon" title="Coming soon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+        Code (coming soon)
+      </span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="abstract">
+      <h2>Abstract</h2>
+      <p>The canonical orientation of a 3D object is often not unique but inherently ambiguous: many objects admit multiple equally valid canonical frames that no single-output regressor can faithfully represent. Rotational symmetry gives this ambiguity a precise structure: the valid orientations form an orbit of the symmetry group. Existing methods struggle to represent this ambiguity: they predict only a single orientation, handle symmetry only under pre-defined group assumptions, or resort to test-time augmentation to approximate the full set of valid orientations. To address these limitations, we introduce an SO(3)-equivariant framework that represents orientation as a distribution, covering finite and continuous symmetry groups within a single representation. Specifically, a truncated Wigner-D expansion encodes multiple valid orientations as a continuous multi-modal distribution over SO(3), without fixing a symmetry group in the architecture. On ShapeNet, in the single-pass inference setting, our per-class models outperform the previous state of the art in every category. When the previous method uses 50-vote augmentation, inference with our full predicted density comes within 0.5 percentage points of its mean accuracy at roughly 12&times; lower latency. Our framework thus captures orientation ambiguity explicitly with both accuracy and efficiency.</p>
+    </section>
+
+    <section>
+      <h2>Method</h2>
+      <figure>
+        <img src="static/images/method_overview.jpg" alt="DORE overview: an SO(3)-equivariant network predicts Wigner-D coefficients of a density over SO(3), supervised by a smoothed symmetry-orbit target from automatic symmetry labeling." loading="lazy">
+        <figcaption>An SO(3)-equivariant network maps a point cloud to the Wigner-D coefficients of a density over SO(3). Training targets are symmetry orbits from an automatic geometry-based labeler, smoothed with a heat kernel; at test time the modes of the density give the valid orientations.</figcaption>
+      </figure>
+      <div class="highlights">
+        <div class="card"><b>Every valid orientation</b><span>A single forward pass yields a multi-modal density over SO(3), with one mode for each valid orientation of a symmetric object.</span></div>
+        <div class="card"><b>No fixed symmetry group</b><span>Cyclic, dihedral and near-continuous symmetries share one representation; no group is built into the architecture.</span></div>
+        <div class="card"><b>Labels from geometry</b><span>Symmetry groups are inferred from the point cloud itself and also choose the band limit of each category before training.</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Qualitative results</h2>
+      <figure>
+        <img src="static/images/qualitative.png" alt="Predicted orientation distributions on ShapeNet airplane, chair, table and lamp, shown on Mollweide projections for CHOIR, Scarvelis et al., DORE and the target." loading="lazy">
+        <figcaption>Predicted orientations on ShapeNet, shown on a Mollweide projection of S&sup2; with hue indicating in-plane tilt. DORE follows the target orbit: a single mode on chair, two modes for table, and an arc on the nearly rotationally symmetric lamp. CHOIR is shown with per-class frame calibration; Scarvelis et al. selects one of 24 quotient orientations by voting.</figcaption>
+      </figure>
+    </section>
+
+    <section class="narrow">
+      <h2>BibTeX</h2>
+      <pre><code>@inproceedings{kim2026dore,
+  title     = {Distributional Estimation of 3D Object Orientation},
+  author    = {Kim, Minjoon and Park, Chunghyun and Cho, Minsu},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2026}
+}</code></pre>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    Paper and code links will be added on release.
+  </footer>
+</body>
+</html>
