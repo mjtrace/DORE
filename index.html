@@ -85,6 +85,7 @@
     .card b { display: block; margin-bottom: 4px; font-size: 15px; }
     .card span { color: var(--muted); font-size: 14.5px; }
     .narrow { max-width: 720px; margin: 0 auto; }
+    .placeholder { margin: 0; color: var(--muted); }
     pre {
       margin: 0; padding: 16px 18px; overflow-x: auto;
       background: var(--wash); border: 1px solid var(--line); border-radius: 8px;
@@ -122,7 +123,7 @@
   <main class="wrap">
     <section class="abstract">
       <h2>Abstract</h2>
-      <p>The canonical orientation of a 3D object is often not unique but inherently ambiguous: many objects admit multiple equally valid canonical frames that no single-output regressor can faithfully represent. Rotational symmetry gives this ambiguity a precise structure: the valid orientations form an orbit of the symmetry group. Existing methods struggle to represent this ambiguity: they predict only a single orientation, handle symmetry only under pre-defined group assumptions, or resort to test-time augmentation to approximate the full set of valid orientations. To address these limitations, we introduce an SO(3)-equivariant framework that represents orientation as a distribution, covering finite and continuous symmetry groups within a single representation. Specifically, a truncated Wigner-D expansion encodes multiple valid orientations as a continuous multi-modal distribution over SO(3), without fixing a symmetry group in the architecture. On ShapeNet, in the single-pass inference setting, our per-class models outperform the previous state of the art in every category. When the previous method uses 50-vote augmentation, inference with our full predicted density comes within 0.5 percentage points of its mean accuracy at roughly 12&times; lower latency. Our framework thus captures orientation ambiguity explicitly with both accuracy and efficiency.</p>
+      <p>The canonical orientation of a 3D object is often not unique, yet inherently ambiguous &ndash; symmetric objects, for instance, admit multiple equally valid canonical frames that no single-output regressor can faithfully represent. Existing methods struggle to handle this ambiguity: they either predict a single orientation, enforce symmetry only under pre-defined group assumptions, or approximate the full set of valid orientations through costly test-time augmentation. We propose a distributional approach that models 3D object orientation as a distribution over SO(3), accommodating both finite and continuous groups without any group-specific architectural bias. To this end, we develop an SO(3)-equivariant framework in which a truncated Wigner-D expansion encodes multiple valid orientations as a continuous, multi-modal distribution. On ShapeNet, our method surpasses the prior state of the art across all categories under single-pass inference. Furthermore, even without test-time rotation augmentation, it matches the accuracy of a 50-vote ensemble baseline to within 0.5 percentage points at roughly 12&times; lower latency, demonstrating that explicit distributional modeling is both accurate and efficient.</p>
     </section>
 
     <section>
@@ -148,12 +149,7 @@
 
     <section class="narrow">
       <h2>BibTeX</h2>
-      <pre><code>@inproceedings{kim2026dore,
-  title     = {Distributional Estimation of 3D Object Orientation},
-  author    = {Kim, Minjoon and Park, Chunghyun and Cho, Minsu},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2026}
-}</code></pre>
+      <p class="placeholder">The citation will be added when the paper is published.</p>
     </section>
   </main>
 
