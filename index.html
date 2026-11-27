@@ -10,7 +10,7 @@
 <script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"},options:{skipHtmlTags:["script","noscript","style","textarea","pre","code","canvas"]}};</script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script>
 <script>document.documentElement.classList.add('js');</script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@500;600;700&family=Unbounded:wght@300;400&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
 /* Layout: a dark opening screen, then a paper-style body on a warm near-white: one centered column (1080px) for text
    and figures, justified text, the demo on a wider dark stage. Single theme on purpose: the paper figures are white. */
@@ -66,17 +66,17 @@ p{margin:0 0 14px}
 .hero-cue svg{width:16px; height:16px}
 @media (max-width:640px){ .hero-cue{display:none} .hero-text{bottom:max(24px, 4vh)} .hbtn{font-size:13px; padding:8px 13px 8px 11px} }
 
-/* theory: five results, one card each, in the order the method uses them */
-.thm-list{list-style:none; margin:22px 0 0; padding:0; display:grid; gap:16px}
-.thm{background:var(--panel); border:1px solid var(--hair); border-radius:16px; padding:20px clamp(16px,2.4vw,28px) 18px; min-width:0}
-.thm-top{display:flex; align-items:center; gap:12px}
-.thm-n{flex:none; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font:600 13px/1 var(--display); color:var(--ink); border:1px solid var(--hair); background:var(--bg)}
-.thm h3{margin:0; font-size:clamp(18px,1.6vw,21px)}
-.thm-ref{margin:6px 0 0 40px; font-size:12.5px; color:var(--faint)}
-.thm .math{overflow-x:auto; overflow-y:hidden; margin:14px 0 12px; padding:4px 0; font-size:15.5px; color:var(--ink)}
+/* theory: one result after another in a single column, split by rules; title and source share the first line */
+.thm-list{list-style:none; margin:26px 0 0; padding:0; border-bottom:1px solid var(--hair)}
+.thm{padding:24px 0 24px; border-top:1px solid var(--hair)}
+.thm-body{min-width:0}
+.thm h3{margin:0; font-size:clamp(17px,1.45vw,20px); line-height:1.3}
+.thm .math{overflow-x:auto; overflow-y:hidden; margin:16px 0 14px; padding:2px 0; font-size:min(15.5px, 3.4vw); color:var(--ink)}
 .thm .math mjx-container[display="true"]{margin:0 !important}
 .thm .text{margin:0; font-size:15px; color:var(--muted)}
 .thm mjx-container{color:var(--ink)}
+.thm .math-narrow{display:none}
+@media (max-width:640px){ .thm .math-wide{display:none} .thm .math-narrow{display:block} .thm .text{text-align:left; hyphens:manual} }
 .degrees{display:grid; grid-template-columns:1.15fr repeat(6, 1fr); gap:6px 10px; align-items:end; margin:18px 0 0; text-align:center}
 .degrees img{display:block; width:100%; height:auto; border:0; border-radius:0; background:none; mix-blend-mode:normal}
 .deg b, .deg span, .deg-in span{display:block; font-size:12.5px}
@@ -127,6 +127,10 @@ ol.steps b{font-weight:600}
 .chart-wrap .lbl{transition:opacity .5s ease}
 .chart-wrap svg.s0 .pt{opacity:0; transform:scale(0)}
 .chart-wrap svg.s0 .lbl, .chart-wrap svg.s1 .lbl{opacity:0}
+
+/* metrics: the accuracy formula centered, then one paragraph */
+.metric-eq{overflow-x:auto; overflow-y:hidden; margin:16px 0 6px; font-size:min(16px, 3.3vw); color:var(--ink)}
+.metric-eq mjx-container[display="true"]{margin:6px 0 !important}
 
 /* Table 1: compiled from the paper's table source, in the paper's orientation. Thin rules on every cell; the DORE
    row outlined in gold (dore) with its best cells filled. */
@@ -341,14 +345,14 @@ footer a:hover{color:var(--ink); text-decoration:none}
   <div class="belt" id="belt" tabindex="0" aria-label="ShapeNet test shapes, each above DORE's predicted density over orientations; click a shape to open it in the demo">
     <canvas id="beltBg"></canvas><canvas id="beltGl"></canvas><canvas id="beltFg"></canvas>
   </div>
-  <div class="gutter"><div class="container"><p class="teaser-cap">ShapeNet test shapes, each spinning above DORE's predicted density over SO(3) on a Mollweide projection. A symmetric shape gets one mode per valid orientation, and the modes turn with the shape. Hover to pause; click a shape to open it in the demo below.</p></div></div>
+  <div class="gutter"><div class="container"><p class="teaser-cap">ShapeNet test shapes, each spinning above DORE's predicted density over SO(3) on a Mollweide projection. A symmetric shape gets one mode per valid orientation, and the modes turn with the shape. Click a shape to open it in the demo below.</p></div></div>
 </figure>
 
 <div class="gutter"><div class="container">
 
 <section class="sec" id="method">
   <h2>Method</h2>
-  <p class="text">A Vector Neurons backbone and an e3nn spectral head map a point cloud to the Wigner-D coefficients of a density over SO(3). Both parts are SO(3)-equivariant by construction, so rotating the input rotates the predicted density, and inference needs no rotation augmentation. The modes of the density are the valid orientations. The mathematics behind each step is collected in <a href="#theory">Theory</a> below.</p>
+  <p class="text">We map a point cloud to the Wigner-D coefficients of a density over SO(3) with a Vector Neurons backbone and an e3nn spectral head. Both are SO(3)-equivariant by construction, so rotating the input rotates the predicted density, and inference needs no rotation augmentation. The modes of the density are the valid orientations. We collect the mathematics behind each step in <a href="#theory">Theory</a> below.</p>
   <figure>
     <img src="static/images/method_overview.jpg" alt="DORE overview: an SO(3)-equivariant backbone and spectral head predict the Wigner-D coefficients of a density over SO(3); the highest mode gives the orientation." loading="lazy">
   </figure>
@@ -361,7 +365,7 @@ footer a:hover{color:var(--ink); text-decoration:none}
 
 <section class="sec" id="try">
   <h2>Interactive demo</h2>
-  <p class="text">Drag the point cloud to rotate the input by <code>R</code>: every mode <code>g</code> of the orbit target, and of DORE's prediction, moves to <code>R·g</code>. When you release it, DORE's highest mode <code>R<sup>*</sup></code> is read off and undone, and the shape returns to one of its canonical poses.</p>
+  <p class="text">Each example below is a ShapeNet test shape, shown next to its orbit target and DORE's predicted density over SO(3). Drag the point cloud to rotate the input, and every mode of both densities turns with it. When you let go, DORE's highest mode <code>R<sup>*</sup></code> is undone and the shape returns to a canonical pose. Choose a shape on the left, and use <b>band</b> on the target to see the degree at which its modes separate.</p>
   <div class="demo" id="demo">
     <div class="demo-grid">
       <nav class="pills" id="pills" aria-label="Shapes"></nav>
@@ -386,18 +390,20 @@ footer a:hover{color:var(--ink); text-decoration:none}
       <button class="bar-btn glass" id="tilt" type="button" aria-label="Random pose" title="Random pose"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
-  <p class="note">ShapeNet test-split shapes, chosen so that each prediction shows one mode per element of the shape's symmetry label. The lamp marked ≈SO(2) is the exception on purpose: its shade is round, the labeler's largest cyclic group C6 stands in for that continuous symmetry, and DORE predicts a continuous ring of orientations (the target becomes a ring as well below band 6). Predictions come from the paper's single-pass models at each category's band L<sub>sym</sub> (dot under the band button). Dots are the top 0.1% of each density on a 200k-rotation grid. Both densities are computed once on the canonical input and moved by <code>R</code> on this page: exactly for the target, and through the network's equivariance for the prediction, which agrees with running the network on the rotated input to within 1%.</p>
+  <p class="note">ShapeNet test shapes, selected so that each prediction shows one mode per valid orientation (the round lamp marked &asymp;SO(2) is the exception). Predictions come from the paper's single-pass models at each category's band L<sub>sym</sub>. The page moves both densities by R; for the prediction this relies on the network's equivariance, which matches running the network on the rotated input to within 1%.</p>
 </section>
 
 <section class="sec" id="results">
   <h2>Results</h2>
   <h3>Benchmark on ShapeNet</h3>
   <p class="text">With one forward pass, DORE is ahead of the prior state of the art in every category on both metrics: 82.8 mean accuracy against 73.7, without test-time augmentation for either method.</p>
-  <div class="tbl-wrap"><table class="t1"><thead><tr><th rowspan="2" class="mth">Method</th><th colspan="6" class="cap">Mean Chamfer distance (&times;10<sup>&minus;3</sup>) &darr;</th><th colspan="6" class="cap grp">Acc<sub>sym</sub>@&epsilon; (%) &uarr;</th></tr><tr><th>Airplane</th><th>Car</th><th>Chair</th><th>Table</th><th>Lamp</th><th>Cellphone</th><th class="grp">Airplane</th><th>Car</th><th>Chair</th><th>Table</th><th>Lamp</th><th>Cellphone</th></tr></thead><tbody><tr><th>CHOIR</th><td>198.1</td><td>103.0</td><td>92.3</td><td>95.5</td><td>238.7</td><td>183.2</td><td class="grp">0.0</td><td>0.0</td><td>0.0</td><td>0.0</td><td>0.0</td><td>0.0</td></tr><tr><th>CHOIR<sup>&dagger;</sup></th><td>16.4</td><td>4.6</td><td>5.8</td><td>44.3</td><td>69.5</td><td>140.1</td><td class="grp">54.2</td><td>86.6</td><td>80.8</td><td>13.1</td><td>16.0</td><td>0.5</td></tr><tr><th>Scarvelis et al.</th><td><u>4.6</u></td><td><u>3.4</u></td><td><u>4.3</u></td><td><u>5.5</u></td><td><u>29.5</u></td><td><u>9.1</u></td><td class="grp"><u>81.9</u></td><td><u>90.1</u></td><td><u>85.5</u></td><td><u>80.5</u></td><td><u>36.9</u></td><td><u>67.6</u></td></tr><tr class="ours"><th>DORE (ours)</th><td class="win"><b>1.5</b></td><td class="win"><b>1.2</b></td><td class="win"><b>2.1</b></td><td class="win"><b>5.1</b></td><td class="win"><b>28.2</b></td><td class="win"><b>5.0</b></td><td class="grp win"><b>92.6</b></td><td class="win"><b>98.3</b></td><td class="win"><b>93.8</b></td><td class="win"><b>84.2</b></td><td class="win"><b>45.6</b></td><td class="win"><b>82.4</b></td></tr></tbody></table></div><p class="t1-note">Table 1 of the paper. One forward pass per input; DORE at L<sub>sym</sub> = 2/2/2/4/6/2. CHOIR<sup>&dagger;</sup> uses per-class frame calibration. A prediction is correct when the Chamfer distance of the canonicalized shape is below &epsilon;, the error of a 10&deg; rotation of the same shape; any orientation in the symmetry orbit counts. Bold: best; underline: second best.</p>
+  <div class="metric-eq">\[ \mathrm{Acc}_{\mathrm{sym}}@\epsilon=\frac{1}{K}\sum_{k=1}^{K}\mathbf{1}\!\left[\,d_{\mathrm{CD}}\big(\mathbf{P}R_k\hat{R}_k^{\top},\,\mathbf{P}\big)\lt\epsilon_{\theta}(\mathbf{P})\,\right] \]</div>
+  <p class="text">A prediction counts as correct when the Chamfer distance between DORE's canonicalized shape and the ground-truth pose is below \(\epsilon_{\theta}(\mathbf{P})\), a Monte Carlo estimate of the Chamfer error of the same shape turned by \(\theta\) about a random axis. Since the shape is compared with itself, every orientation in its symmetry orbit counts as correct. The mean Chamfer distance averages the same distance without a threshold. Each test shape is evaluated at \(K=11\) random rotations, with \(\theta=10^{\circ}\) and 32 random axes for \(\epsilon_{\theta}\).</p>
+  <div class="tbl-wrap"><table class="t1"><thead><tr><th rowspan="2" class="mth">Method</th><th colspan="6" class="cap">Mean Chamfer distance (&times;10<sup>&minus;3</sup>) &darr;</th><th colspan="6" class="cap grp">Acc<sub>sym</sub>@&epsilon; (%) &uarr;</th></tr><tr><th>Airplane</th><th>Car</th><th>Chair</th><th>Table</th><th>Lamp</th><th>Cellphone</th><th class="grp">Airplane</th><th>Car</th><th>Chair</th><th>Table</th><th>Lamp</th><th>Cellphone</th></tr></thead><tbody><tr><th>CHOIR</th><td>198.1</td><td>103.0</td><td>92.3</td><td>95.5</td><td>238.7</td><td>183.2</td><td class="grp">0.0</td><td>0.0</td><td>0.0</td><td>0.0</td><td>0.0</td><td>0.0</td></tr><tr><th>CHOIR<sup>&dagger;</sup></th><td>16.4</td><td>4.6</td><td>5.8</td><td>44.3</td><td>69.5</td><td>140.1</td><td class="grp">54.2</td><td>86.6</td><td>80.8</td><td>13.1</td><td>16.0</td><td>0.5</td></tr><tr><th>Scarvelis et al.</th><td><u>4.6</u></td><td><u>3.4</u></td><td><u>4.3</u></td><td><u>5.5</u></td><td><u>29.5</u></td><td><u>9.1</u></td><td class="grp"><u>81.9</u></td><td><u>90.1</u></td><td><u>85.5</u></td><td><u>80.5</u></td><td><u>36.9</u></td><td><u>67.6</u></td></tr><tr class="ours"><th>DORE (ours)</th><td class="win"><b>1.5</b></td><td class="win"><b>1.2</b></td><td class="win"><b>2.1</b></td><td class="win"><b>5.1</b></td><td class="win"><b>28.2</b></td><td class="win"><b>5.0</b></td><td class="grp win"><b>92.6</b></td><td class="win"><b>98.3</b></td><td class="win"><b>93.8</b></td><td class="win"><b>84.2</b></td><td class="win"><b>45.6</b></td><td class="win"><b>82.4</b></td></tr></tbody></table></div><p class="t1-note">Table 1 of the paper. One forward pass per input; DORE at L<sub>sym</sub> = 2/2/2/4/6/2. CHOIR<sup>&dagger;</sup> uses per-class frame calibration. Bold: best; underline: second best.</p>
   <div class="split tts">
     <div>
       <h3>Test-time scaling</h3>
-      <p class="text">Reading several modes of the density adds best-of-N selection and coefficient averaging: 85.5 at 28.5 ms per shape. The baseline needs 50-vote augmentation, 353.2 ms, to reach 86.0; at DORE's latency (4 votes) it reaches 81.0.</p>
+      <p class="text">Using several modes of the density adds best-of-N selection and coefficient averaging: 85.5 at 28.5 ms per shape. The baseline needs 50-vote augmentation, 353.2 ms, to reach 86.0; at about the same time per shape (4 votes, 28.3 ms) it reaches 81.0.</p>
       <p class="note">Six-category mean Acc<sub>sym</sub>@ε against wall time per shape at batch size 64 on one RTX 3090, linear axis. Baseline: Scarvelis et al., retrained per category with the authors' code. BoN: best-of-N selection among density modes; CA: coefficient averaging over eight inputs.</p>
     </div>
     <div>
@@ -406,13 +412,12 @@ footer a:hover{color:var(--ink); text-decoration:none}
     </div>
   </div>
   <h3>Qualitative comparison</h3>
-  <p class="text">DORE's prediction follows the orbit of the target: a single mode on the chair, two modes for the table's C2 symmetry, and an arc through the six target modes of the nearly round lamp.</p>
+  <p class="text">Each column is a test shape in its input pose. Below it are the orientations predicted by CHOIR (with per-class frame calibration), Scarvelis et al. and DORE, and the target, on a Mollweide projection with hue for the in-plane tilt. CHOIR and Scarvelis et al. return one orientation; the latter selects one of 24 quotient orientations by voting. DORE predicts a density whose modes follow the target: a single mode on the chair, two modes for the table's C2 symmetry, and an arc through the six target modes of the nearly round lamp.</p>
   <figure>
     <img src="static/images/qualitative.png" alt="Predicted orientation distributions on ShapeNet airplane, chair, table and lamp for CHOIR, Scarvelis et al., DORE and the target, on Mollweide projections." loading="lazy">
-    <figcaption>Mollweide projection of each method's output on test shapes, hue indicating in-plane tilt. CHOIR is shown with per-class frame calibration; Scarvelis et al. selects one of 24 quotient orientations by voting.</figcaption>
   </figure>
   <h3>Random test samples</h3>
-  <p class="text">Randomly drawn test inputs, the ground-truth canonical pose (GT), and the pose DORE returns in one forward pass. Failures are drawn in proportion to each category's failure rate, with at least one per category, as in the paper's appendix. For scale, the two dashed tiles show GT turned by a uniformly random rotation at least 30° away from it, scored the same way. Numbers are the Chamfer distance to GT in units of the per-object threshold ε, the error of a 10° rotation of the shape; at most 1ε counts as correct. A symmetric shape may come back in another valid orientation than GT and still be correct.</p>
+  <p class="text">Each card shows a randomly drawn test input, its ground-truth pose (GT), and the pose DORE returns in one forward pass, with the Chamfer distance to GT in units of &epsilon;. As in the accuracy above, a pose passes when this distance is below 1&epsilon;. Failures are drawn in proportion to each category's failure rate, with at least one per category. For scale, the two dashed tiles show GT turned by a random rotation of at least 30&deg;.</p>
   <div class="gal-nav"><div class="gal-tabs glass" role="group" aria-label="Category"><span class="gal-thumb" aria-hidden="true"></span>
   <button type="button" class="gtab" id="gal-plane" data-cls="plane" aria-pressed="true">Airplane</button>
   <button type="button" class="gtab" id="gal-car" data-cls="car" aria-pressed="false">Car</button>
@@ -469,31 +474,34 @@ footer a:hover{color:var(--ink); text-decoration:none}
 
 <section class="sec" id="theory">
   <h2>Theory</h2>
-  <p class="text">DORE is built on the representation theory of SO(3). Five results carry the method, each stated and proved in the paper's appendix.</p>
+  <p class="text">DORE is built on the representation theory of SO(3). The method rests on five results, each stated and proved in the paper's appendix.</p>
   <ol class="thm-list">
     <li class="thm">
-      <div class="thm-top"><span class="thm-n">1</span><h3>A density on SO(3) is a stack of matrix blocks</h3></div>
-      <p class="thm-ref">Peter–Weyl theorem · Appendix A.1</p>
-      <div class="math">\[ L^2(SO(3)) \;\cong\; \widehat{\bigoplus_{\ell\ge 0}}\, \operatorname{End}(V^\ell), \qquad f(R)=\sum_{\ell\ge 0}(2\ell+1)\,\operatorname{tr}\!\big(H^\ell D^\ell(R)^{\top}\big), \qquad H^\ell=\int_{SO(3)} f(R)\,D^\ell(R)\,\mathrm{d}R \]</div>
-      <p class="text">The Wigner-D matrices \(D^\ell\) of the irreducible representations \(V^\ell\), of dimension \(2\ell+1\), form an orthogonal basis of \(L^2(SO(3))\), and the Plancherel identity \(\|f\|^2=\sum_\ell (2\ell+1)\|H^\ell\|_F^2\) turns distances between densities into distances between coefficients. DORE outputs the blocks up to a band \(L_{\max}\): \(\sum_{\ell\le L_{\max}}(2\ell+1)^2\) numbers, which is 35, 165 and 455 at \(L_{\max}=2, 4, 6\).</p>
+      <h3>A density on SO(3) is a stack of matrix blocks</h3>
+      <div class="thm-body">
+      <div class="math math-wide">\[ L^2(SO(3)) \;\cong\; \widehat{\bigoplus_{\ell\ge 0}}\, \operatorname{End}(V^\ell),  \qquad f(R)=\sum_{\ell\ge 0}(2\ell+1)\,\operatorname{tr}\!\big(H^\ell D^\ell(R)^{\top}\big), \qquad H^\ell=\int_{SO(3)} f(R)\,D^\ell(R)\,\mathrm{d}R \]</div><div class="math math-narrow">\[ \begin{gathered} L^2(SO(3)) \;\cong\; \widehat{\bigoplus_{\ell\ge 0}}\, \operatorname{End}(V^\ell) \\[5pt] f(R)=\sum_{\ell\ge 0}(2\ell+1)\,\operatorname{tr}\!\big(H^\ell D^\ell(R)^{\top}\big) \\[5pt] H^\ell=\int_{SO(3)} f(R)\,D^\ell(R)\,\mathrm{d}R \end{gathered} \]</div>
+      <p class="text">By the Peter–Weyl theorem, the Wigner-D matrices \(D^\ell\) of the irreducible representations \(V^\ell\), of dimension \(2\ell+1\), form an orthogonal basis of \(L^2(SO(3))\), and the Plancherel identity \(\|f\|^2=\sum_\ell (2\ell+1)\|H^\ell\|_F^2\) turns distances between densities into distances between coefficients. DORE outputs the blocks up to a band \(L_{\max}\): \(\sum_{\ell\le L_{\max}}(2\ell+1)^2\) numbers, which is 35, 165 and 455 at \(L_{\max}=2, 4, 6\) (Appendix A.1).</p>
+      </div>
     </li>
     <li class="thm">
-      <div class="thm-top"><span class="thm-n">2</span><h3>Equivariance is one linear rule per block</h3></div>
-      <p class="thm-ref">Coefficient condition for equivariance · Appendices A.2 and A.3</p>
-      <div class="math">\[ h(\mathbf{P}R)(S)=h(\mathbf{P})(SR^{-1}) \;\;\text{for all } S \quad\Longleftrightarrow\quad \hat{H}^\ell(\mathbf{P}R)=\hat{H}^\ell(\mathbf{P})\,D^\ell(R) \;\;\text{for all } \ell \]</div>
-      <p class="text">Rotating the input moves every mode of the predicted density with it exactly when each block is multiplied on the right by \(D^\ell(R)\). The spectral head meets this rule by construction: the spherical-harmonic lift satisfies \(Y^\ell(Rv)=D^\ell(R)\,Y^\ell(v)\), the linear layers mix only channels while \(D^\ell(R)\) acts only on the irrep index, so the two commute. Inference therefore needs no rotation augmentation.</p>
+      <h3>Equivariance is one linear rule per block</h3>
+      <div class="thm-body">
+      <div class="math math-wide">\[ h(\mathbf{P}R)(S)=h(\mathbf{P})(SR^{-1}) \;\;\text{for all } S \quad\Longleftrightarrow\quad \hat{H}^\ell(\mathbf{P}R)=\hat{H}^\ell(\mathbf{P})\,D^\ell(R) \;\;\text{for all } \ell \]</div><div class="math math-narrow">\[ \begin{gathered} h(\mathbf{P}R)(S)=h(\mathbf{P})(SR^{-1}) \;\;\text{for all } S \\[5pt] \Updownarrow \\[5pt] \hat{H}^\ell(\mathbf{P}R)=\hat{H}^\ell(\mathbf{P})\,D^\ell(R) \;\;\text{for all } \ell \end{gathered} \]</div>
+      <p class="text">Rotating the input moves every mode of the predicted density with it exactly when each block is multiplied on the right by \(D^\ell(R)\). The spectral head meets this rule by construction: the spherical-harmonic lift satisfies \(Y^\ell(Rv)=D^\ell(R)\,Y^\ell(v)\), the linear layers mix only channels while \(D^\ell(R)\) acts only on the irrep index, so the two commute. Inference therefore needs no rotation augmentation (Appendices A.2 and A.3).</p>
+      </div>
     </li>
     <li class="thm">
-      <div class="thm-top"><span class="thm-n">3</span><h3>A symmetry group is a projector</h3></div>
-      <p class="thm-ref">Group identification lemma · Appendices A.1 and B.3</p>
-      <div class="math">\[ F^\ell_G=\frac{1}{|G|}\sum_{g\in G} D^\ell(g), \qquad (F^\ell_G)^2=F^\ell_G=(F^\ell_G)^{\top}, \qquad \operatorname{tr}F^\ell_G=m_\ell(G), \qquad H^{*\ell}=\kappa_\ell\,F^\ell_G \]</div>
-      <p class="text">Averaging \(D^\ell\) over a group \(G\le SO(3)\), with a Haar average when \(G\) is continuous, gives the orthogonal projector onto the \(G\)-invariant vectors of \(V^\ell\), and its trace counts them. The training target of a shape with symmetry \(G\) is exactly these projectors, damped by a heat kernel, \(\kappa_\ell=e^{-\ell(\ell+1)\sigma^2}\), so \(\|H^{*\ell}\|_F\le\sqrt{2\ell+1}\,\kappa_\ell\). Densities invariant under \(G\) are densities on the coset space, \(L^2(SO(3))^G\cong L^2(G\backslash SO(3))\): one output space holds the quotient for every \(G\), with no group fixed in advance.</p>
+      <h3>A symmetry group is a projector</h3>
+      <div class="thm-body">
+      <div class="math math-wide">\[ F^\ell_G=\frac{1}{|G|}\sum_{g\in G} D^\ell(g), \qquad (F^\ell_G)^2=F^\ell_G=(F^\ell_G)^{\top}, \qquad \operatorname{tr}F^\ell_G=m_\ell(G), \qquad H^{*\ell}=\kappa_\ell\,F^\ell_G \]</div><div class="math math-narrow">\[ \begin{gathered} F^\ell_G=\frac{1}{|G|}\sum_{g\in G} D^\ell(g) \\[5pt] (F^\ell_G)^2=F^\ell_G=(F^\ell_G)^{\top} \\[5pt] \operatorname{tr}F^\ell_G=m_\ell(G) \\[5pt] H^{*\ell}=\kappa_\ell\,F^\ell_G \end{gathered} \]</div>
+      <p class="text">Averaging \(D^\ell\) over a group \(G\le SO(3)\), with a Haar average when \(G\) is continuous, gives the orthogonal projector onto the \(G\)-invariant vectors of \(V^\ell\), and its trace counts them. The training target of a shape with symmetry \(G\) is exactly these projectors, damped by a heat kernel, \(\kappa_\ell=e^{-\ell(\ell+1)\sigma^2}\), so \(\|H^{*\ell}\|_F\le\sqrt{2\ell+1}\,\kappa_\ell\). Densities invariant under \(G\) are densities on the coset space, \(L^2(SO(3))^G\cong L^2(G\backslash SO(3))\): one output space holds the quotient for every \(G\), with no group fixed in advance (Appendices A.1 and B.3).</p>
+      </div>
     </li>
     <li class="thm">
-      <div class="thm-top"><span class="thm-n">4</span><h3>An \(n\)-fold symmetry first appears at degree \(n\)</h3></div>
-      <p class="thm-ref">First expressible degree · Appendix A.1</p>
-      <div class="math">\[ m_\ell(C_n)=1+2\Big\lfloor \frac{\ell}{n}\Big\rfloor, \qquad m_\ell(D_n)=\Big\lfloor \frac{\ell}{n}\Big\rfloor+\mathbf{1}[\ell\ \text{even}], \qquad L&lt;n \;\Rightarrow\; f^{C_n}_L=f^{SO(2)}_L,\;\; f^{D_n}_L=f^{O(2)}_L \]</div>
-      <p class="text">With the axis along \(z\), a degree-\(\ell\) vector is \(C_n\)-invariant exactly when its azimuthal index \(m\) satisfies \(n\mid m\). Below degree \(n\) only \(m=0\) survives, so a band-limited \(n\)-fold orbit cannot be told apart from the continuous ridge of \(SO(2)\) or \(O(2)\); at degree \(n\) its \(n\) modes separate. The polyhedral groups \(T\), \(O\), \(I\) first appear at degrees 3, 4 and 6. This is how DORE sets the band of each category, \(L_{\mathrm{sym}}\), from the symmetry labels alone.</p>
+      <h3>An \(n\)-fold symmetry first appears at degree \(n\)</h3>
+      <div class="thm-body">
+      <div class="math math-wide">\[ m_\ell(C_n)=1+2\Big\lfloor \frac{\ell}{n}\Big\rfloor, \qquad m_\ell(D_n)=\Big\lfloor \frac{\ell}{n}\Big\rfloor+\mathbf{1}[\ell\ \text{even}],  \qquad L&lt;n \;\Rightarrow\; f^{C_n}_L=f^{SO(2)}_L,\;\; f^{D_n}_L=f^{O(2)}_L \]</div><div class="math math-narrow">\[ \begin{gathered} m_\ell(C_n)=1+2\Big\lfloor \frac{\ell}{n}\Big\rfloor \\[5pt] m_\ell(D_n)=\Big\lfloor \frac{\ell}{n}\Big\rfloor+\mathbf{1}[\ell\ \text{even}] \\[5pt] L&lt;n \;\Rightarrow\; f^{C_n}_L=f^{SO(2)}_L,\;\; f^{D_n}_L=f^{O(2)}_L \end{gathered} \]</div>
+      <p class="text">With the axis along \(z\), a degree-\(\ell\) vector is \(C_n\)-invariant exactly when its azimuthal index \(m\) satisfies \(n\mid m\). Below degree \(n\) only \(m=0\) survives, so a band-limited \(n\)-fold orbit cannot be told apart from the continuous ridge of \(SO(2)\) or \(O(2)\); at degree \(n\) its \(n\) modes separate. The polyhedral groups \(T\), \(O\), \(I\) first appear at degrees 3, 4 and 6. This is how DORE sets the band of each category, \(L_{\mathrm{sym}}\), from the symmetry labels alone (Appendix A.1).</p>
       <figure class="degrees" aria-label="A table with a four-fold symmetry and its target density truncated at degrees 1 to 6">
         <div class="deg-in"><img src="static/images/theory/table_c4.png" alt="A table with a four-fold symmetry" loading="lazy" width="280" height="280"><span>C<sub>4</sub> table</span></div>
         <div class="deg"><img src="static/images/theory/globe_L1.png" alt="Degree 1: a ridge" loading="lazy" width="280" height="280"><b>ℓ ≤ 1</b><span>ridge</span></div>
@@ -504,12 +512,14 @@ footer a:hover{color:var(--ink); text-decoration:none}
         <div class="deg"><img src="static/images/theory/globe_L6.png" alt="Degree 6: sharper modes" loading="lazy" width="280" height="280"><b>ℓ ≤ 6</b><span>sharper</span></div>
         <figcaption>The orbit target of a table with a four-fold symmetry, kept up to degree ℓ. Each arrow is one orientation of the table.</figcaption>
       </figure>
+      </div>
     </li>
     <li class="thm">
-      <div class="thm-top"><span class="thm-n">5</span><h3>The loss is a Sobolev distance</h3></div>
-      <p class="thm-ref">Casimir spectrum and Sobolev weights · Appendix C.1</p>
-      <div class="math">\[ \Delta D^\ell_{ij}=-\ell(\ell+1)\,D^\ell_{ij}, \qquad w_\ell=\ell(\ell+1) \;\Rightarrow\; Z\,\mathcal{L}_{\mathrm{sup}} \;\asymp\; \|\hat{h}-h^*\|^2_{H^{-1/2}(SO(3))}, \qquad w_\ell=\lambda_\ell^{\,k} \;\leftrightarrow\; s=k-\tfrac{3}{2} \]</div>
-      <p class="text">The Laplace–Beltrami operator acts on degree \(\ell\) by the Casimir eigenvalue \(-\ell(\ell+1)\). Weighting each block error by \(w_\ell=\ell(\ell+1)\), averaged over its \((2\ell+1)^2\) entries, makes the training objective equivalent, up to constants, to the squared \(H^{-1/2}\) Sobolev distance between band-limited densities of equal mass; weights \(\lambda_\ell^k\) give \(H^{k-3/2}\). A negative order compares smoothed densities, which matches the heat-kernel targets.</p>
+      <h3>The loss is a Sobolev distance</h3>
+      <div class="thm-body">
+      <div class="math math-wide">\[ \Delta D^\ell_{ij}=-\ell(\ell+1)\,D^\ell_{ij}, \qquad w_\ell=\ell(\ell+1) \;\Rightarrow\; Z\,\mathcal{L}_{\mathrm{sup}} \;\asymp\; \|\hat{h}-h^*\|^2_{H^{-1/2}(SO(3))},  \qquad w_\ell=\lambda_\ell^{\,k} \;\leftrightarrow\; s=k-\tfrac{3}{2} \]</div><div class="math math-narrow">\[ \begin{gathered} \Delta D^\ell_{ij}=-\ell(\ell+1)\,D^\ell_{ij} \\[5pt] w_\ell=\ell(\ell+1) \;\Rightarrow\; Z\,\mathcal{L}_{\mathrm{sup}} \;\asymp\; \|\hat{h}-h^*\|^2_{H^{-1/2}(SO(3))} \\[5pt] w_\ell=\lambda_\ell^{\,k} \;\leftrightarrow\; s=k-\tfrac{3}{2} \end{gathered} \]</div>
+      <p class="text">The Laplace–Beltrami operator acts on degree \(\ell\) by the Casimir eigenvalue \(-\ell(\ell+1)\). Weighting each block error by \(w_\ell=\ell(\ell+1)\), averaged over its \((2\ell+1)^2\) entries, makes the training objective equivalent, up to constants, to the squared \(H^{-1/2}\) Sobolev distance between band-limited densities of equal mass; weights \(\lambda_\ell^k\) give \(H^{k-3/2}\). A negative order compares smoothed densities, which matches the heat-kernel targets (Appendix C.1).</p>
+      </div>
     </li>
   </ol>
 </section>
@@ -737,8 +747,8 @@ footer a:hover{color:var(--ink); text-decoration:none}
           // label + map
           const top = 36 + cloudH + 8, mx = x - mapW/2;
           fctx.font = `500 12px ${css('--sans')}`; fctx.textBaseline = 'alphabetic'; fctx.textAlign = 'left';
-          fctx.fillStyle = muted; fctx.fillText(CATNAME[o.it.category], mx, 26);
-          fctx.textAlign = 'right'; fctx.fillStyle = ink; fctx.fillText(GROUPTXT(o.it.display), mx + mapW, 26);
+          fctx.textAlign = 'center'; fctx.fillStyle = ink; fctx.fillText(`${CATNAME[o.it.category]} (${GROUPTXT(o.it.display)})`, mx + mapW/2, 26);
+          
           fctx.drawImage(sprite.cv, mx, top, mapW, mapH);
           drawDensity(fctx, mx, top, mapW, mapH, sprite.s, R, o.it.pModes, mul(R, o.it.top), css('--ink'), 0.11);
           if (i === hoverI){ fctx.strokeStyle = 'rgba(28,36,48,0.22)'; fctx.lineWidth = 1; fctx.strokeRect(x-itemW/2+4, 8, itemW-8, H-14); }
